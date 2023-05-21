@@ -28,7 +28,28 @@ async function run() {
 
     const carCollection=client.db("carsDB").collection('cars');
     const carsGallery=client.db("carsDB").collection('gallery');
-     
+    
+
+    const indexKey={toyName:1}
+    const indexOption={name:'toyName'}
+    const result=carCollection.createIndex(indexKey,indexOption);
+
+    app.get('/myCarsSearch/:search', async(req, res)=>{
+        const search=req.params.search;
+        const result= await carCollection.find({
+            $or:[
+                {
+                    toyName:{$regex:search, $options:"i"}
+                }
+            ]
+        }).toArray();
+        res.send(result)
+    })
+
+    app.get("/carsAllData", async(req, res)=>{
+        const result= await carCollection.find().toArray();
+        res.send(result)
+    })
     // allCars
     app.get('/allCars/:id',async(req,res)=>{
         const id=req.params.id;
@@ -36,41 +57,52 @@ async function run() {
         const result=await carCollection.findOne(query);
         res.send(result);
     })
+    
 
     // galleyCars
-    app.get('/gallery',async(req,res)=>{
-        const carCursor=carsGallery.find();
-        const result=carCursor.toArray();
-        res.send(result)
-    })
+    // app.get('/gallery',async(req,res)=>{
+    //     const carCursor=carsGallery.find();
+    //     const result=carCursor.toArray();
+    //     res.send(result)
+    // })
     // myCars
     app.get('/myCars/:email',async(req,res)=>{
        const query={email:req.params.email};
+       const sort=req?.query?.sort===true?1:-1
+       const result=await carCollection.find(query).sort({price:sort}).toArray();
+       res.send(result);
+
+    })
+    app.get('/carsCard/:categories',async(req,res)=>{
+       const query={Category:req.params.categories};
        const result=await carCollection.find(query).toArray();
        res.send(result);
     })
     // postCars
-    app.post('postCar',async(req,res)=>{
+    app.post('/carsAll',async(req,res)=>{
       const body=req.body;
       const result=await carCollection.insertOne(body);
       res.send(result)
     })
     // updateCars
-    app.put('/cars/:id',async(req,res)=>{
+    app.put('/carsAllDat/:id',async(req,res)=>{
         const id=req.params.id;
+        console.log(id);
         const filter={_id :new ObjectId(id)};
-        const options={upsert:true};
-        const carsUpdate=req.body;
-        const user={
-            $set:{
-                sellerName:carsUpdate.sellerName,
-                quantity:carsUpdate.quantity,
-                details:carsUpdate.details,
-                price:carsUpdate.price
-            }
-        }
-        const result=await carCollection.updateOne(filter,user,options);
-        res.send(result)
+        console.log(filter);
+        // const options={upsert:true};
+        // const carsUpdate=req.body;
+        // console.log(carsUpdate);
+        // const user={
+        //     $set:{
+        //         price:carsUpdate.price,
+        //         quantity:carsUpdate.quantity,
+        //         details:carsUpdate.details
+                
+        //     }
+        // }
+        // const result=await carCollection.updateOne(filter,user,options);
+        // res.send(result)
     })
     // deleteCars
     app.delete('/myCars/:id',async(req,res)=>{
