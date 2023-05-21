@@ -24,7 +24,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     const carCollection=client.db("carsDB").collection('cars');
     const carsGallery=client.db("carsDB").collection('gallery');
@@ -85,24 +85,24 @@ async function run() {
       res.send(result)
     })
     // updateCars
-    app.put('/carsAllDat/:id',async(req,res)=>{
+    app.put('/carsAllData/:id',async(req,res)=>{
         const id=req.params.id;
         console.log(id);
         const filter={_id :new ObjectId(id)};
         console.log(filter);
-        // const options={upsert:true};
-        // const carsUpdate=req.body;
-        // console.log(carsUpdate);
-        // const user={
-        //     $set:{
-        //         price:carsUpdate.price,
-        //         quantity:carsUpdate.quantity,
-        //         details:carsUpdate.details
+        const options={upsert:true};
+        const carsUpdate=req.body;
+        console.log(carsUpdate);
+        const user={
+            $set:{
+                price:carsUpdate.price,
+                quantity:carsUpdate.quantity,
+                details:carsUpdate.details
                 
-        //     }
-        // }
-        // const result=await carCollection.updateOne(filter,user,options);
-        // res.send(result)
+            }
+        }
+        const result=await carCollection.updateOne(filter,user,options);
+        res.send(result)
     })
     // deleteCars
     app.delete('/myCars/:id',async(req,res)=>{
