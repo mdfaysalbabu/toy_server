@@ -47,7 +47,7 @@ async function run() {
     })
 
     app.get("/carsAllData", async(req, res)=>{
-        const result= await carCollection.find().toArray();
+        const result= await carCollection.find().limit(20).toArray();
         res.send(result)
     })
     // allCars
@@ -60,11 +60,10 @@ async function run() {
     
 
     // galleyCars
-    // app.get('/gallery',async(req,res)=>{
-    //     const carCursor=carsGallery.find();
-    //     const result=carCursor.toArray();
-    //     res.send(result)
-    // })
+    app.get('/galleryData',async(req,res)=>{
+       const result=await carsGallery.find().toArray();
+       res.send(result)
+    })
     // myCars
     app.get('/myCars/:email',async(req,res)=>{
        const query={email:req.params.email};
